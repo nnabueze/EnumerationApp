@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/dashboard"
+        android:checkable="true"
+        android:title="Dashboard"/>
+    <item
+        android:title="MDA's"
+        android:checkable="true"
+        android:id="@+id/mda"/>
+    <item
+        android:title="Remittance"
+        android:checkable="true"
+        android:id="@+id/remittance"/>
+    <item
+        android:title="POS"
+        android:checkable="true"
+        android:id="@+id/pos"/>
+    <item
+        android:title="Ebills"
+        android:checkable="true"
+        android:id="@+id/ebills"/>
+    <item
+        android:title="Logout"
+        android:checkable="true"
+        android:id="@+id/logout"/>
+
+</menu>
