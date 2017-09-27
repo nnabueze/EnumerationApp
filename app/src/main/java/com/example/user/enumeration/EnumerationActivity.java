@@ -21,12 +21,6 @@ public class EnumerationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enumeration);
 
-        /*toolbar = (Toolbar) findViewById(R.id.actionbar);
-        toolbar.setTitle("Enumeration");*/
-
-        /*collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collaspingToolbBar);
-        collapsingToolbarLayout.setTitle("Enumeration");*/
-
         final Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
@@ -34,7 +28,7 @@ public class EnumerationActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(v, "Added for feature use", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
