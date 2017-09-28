@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private Button login;
     private AuthModel auth;
+    private Boolean exit = false;
     @Bind(R.id.input_email) EditText emailText;
     @Bind(R.id.input_password) EditText passwordText;
 
@@ -166,7 +168,8 @@ public class LoginActivity extends AppCompatActivity {
     private void onLoginFailDialog() {
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+            /*builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);*/
+            builder = new AlertDialog.Builder(this);
         } else {
             builder = new AlertDialog.Builder(this);
         }
@@ -215,6 +218,25 @@ public class LoginActivity extends AppCompatActivity {
             return true;
         }else {
             return false;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if (exit) {
+            finish(); // finish activity
+        } else {
+            Toast.makeText(this, "Press Back again to Exit.",
+                    Toast.LENGTH_SHORT).show();
+            exit = true;
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    exit = false;
+                }
+            }, 10 * 1000);
+
         }
     }
 }
