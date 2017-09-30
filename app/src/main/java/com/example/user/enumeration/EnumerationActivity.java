@@ -4,10 +4,13 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -22,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -33,6 +37,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.user.enumeration.parser.AuthParser;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,6 +48,17 @@ public class EnumerationActivity extends AppCompatActivity {
     private EditText surname, firstname, middlename, phone, email, region, csp, meterNo, meterType;
     private Button submit;
 
+    private Button buttonChoose;
+
+    private ImageView imageView;
+
+    private Bitmap bitmap;
+
+    private int PICK_IMAGE_REQUEST = 1;
+
+    private String KEY_IMAGE = "image";
+    private String KEY_NAME = "name";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +67,13 @@ public class EnumerationActivity extends AppCompatActivity {
         setUpCollapsToolBar();
         getEditText();
 
+        buttonChoose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectImage();
+            }
+        });
+
         submit = (Button) findViewById(R.id.btn_login);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,6 +81,29 @@ public class EnumerationActivity extends AppCompatActivity {
                 login();
             }
         });
+    }
+
+    private void selectImage() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Uri filePath = data.getData();
+            try {
+                //Getting the Bitmap from Gallery
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+                //Setting the Bitmap to ImageView
+                imageView.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void login() {
@@ -132,7 +178,7 @@ public class EnumerationActivity extends AppCompatActivity {
             /*builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);*/
             builder = new AlertDialog.Builder(this);
         } else {
-            builder = new AlertDialog.Builder(this);git
+            builder = new AlertDialog.Builder(this);
         }
 
         builder.setTitle("Success Message");
@@ -261,6 +307,9 @@ public class EnumerationActivity extends AppCompatActivity {
         csp = (EditText) findViewById(R.id.input_CSP);
         meterNo = (EditText) findViewById(R.id.input_meterNo);
         meterType = (EditText) findViewById(R.id.input_meterType);
+
+        buttonChoose = (Button) findViewById(R.id.buttonChoose);
+        imageView  = (ImageView) findViewById(R.id.imageView);
     }
 
     private void setUpCollapsToolBar() {
