@@ -132,7 +132,7 @@ public class EnumerationActivity extends AppCompatActivity {
             /*builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);*/
             builder = new AlertDialog.Builder(this);
         } else {
-            builder = new AlertDialog.Builder(this);
+            builder = new AlertDialog.Builder(this);git
         }
 
         builder.setTitle("Success Message");
