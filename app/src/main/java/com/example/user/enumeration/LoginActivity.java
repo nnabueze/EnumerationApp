@@ -71,10 +71,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void makeCall() {
-        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this, R.style.Theme_AppCompat_Dialog);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Authenticating...");
-        progressDialog.show();
+        //final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this, R.style.Theme_AppCompat_Dialog);
+        final ProgressDialog progressDialog= ProgressDialog.show(this,"Authenticating...","Please wait...",false,false);
+//        progressDialog.setIndeterminate(true);
+//        progressDialog.setMessage("Authenticating...");
+//        progressDialog.show();
         StringRequest request = new StringRequest(Request.Method.POST, Utility.TOKEN,
 
                 new Response.Listener<String>() {

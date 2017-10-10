@@ -27,4 +27,5 @@ public class Utility {
     public static final String LOGIN_MOBILE ="http://hub.ercasng.com:8011/api/pos/MobileLogin";
     public static final String TOKEN ="http://hub.ercasng.com:8011/token";
     public static final String ENUMERATION ="http://hub.ercasng.com:8011/api/pos/Enumeration";
+    public static final String IMAGE_UPLOAD ="http://hub.ercasng.com:8011/api/pos/UserImage";
 }

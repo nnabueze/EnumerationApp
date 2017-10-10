@@ -19,6 +19,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,16 +31,23 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.user.enumeration.parser.AuthParser;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 public class EnumerationActivity extends AppCompatActivity {
@@ -55,9 +64,6 @@ public class EnumerationActivity extends AppCompatActivity {
     private Bitmap bitmap;
 
     private int PICK_IMAGE_REQUEST = 1;
-
-    private String KEY_IMAGE = "image";
-    private String KEY_NAME = "name";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +112,85 @@ public class EnumerationActivity extends AppCompatActivity {
         }
     }
 
+    private void uploadImage(){
+        //Showing the progress dialog
+        final ProgressDialog loading = ProgressDialog.show(this,"Uploading...","Please wait...",false,false);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Utility.IMAGE_UPLOAD,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        //Disimissing the progress dialog
+                        loading.dismiss();
+                        //Showing toast message of the response
+                        Toast.makeText(EnumerationActivity.this, s , Toast.LENGTH_LONG).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //Dismissing the progress dialog
+                        loading.dismiss();
+
+                        //Showing toast
+                        if (error instanceof TimeoutError || error instanceof NoConnectionError) {
+                            Log.d("Maps:", " Error: " + new String(error.networkResponse.data));
+                            onLoginFailDialog("Communication Error!");
+
+                        } else if (error instanceof AuthFailureError) {
+                            Log.d("Maps:", " Error: " + new String(error.networkResponse.data));
+                            onLoginFailDialog("Authentication Error!");
+                        } else if (error instanceof ServerError) {
+                            Log.d("Maps:", " Error: " + new String(error.networkResponse.data));
+                            onLoginFailDialog("Server Side Error!");
+                        } else if (error instanceof NetworkError) {
+                            Log.d("Maps:", " Error: " + new String(error.networkResponse.data));
+                            onLoginFailDialog("Network Error!");
+                        } else if (error instanceof ParseError) {
+                            Log.d("Maps:", " Error: " + new String(error.networkResponse.data));
+                            onLoginFailDialog("Parse Error!");
+                        }
+                        Log.d("Maps:", " Error: " + new String(error.networkResponse.data));
+                    }
+                }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                //Converting Bitmap to String
+                String image = getStringImage(bitmap);
+
+                //Creating parameters
+                Map<String,String> params = new HashMap<>();
+                Log.e("Image One", image);
+                //Adding parameters
+                params.put("File", image);
+
+                //returning parameters
+                return params;
+            }
+
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                HashMap<String, String> headers = new HashMap<>();
+//                headers.put("content-type", "multipart/form-data");
+//                return headers;
+//            }
+        };
+
+        //Creating a Request Queue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        //Adding request to the queue
+        requestQueue.add(stringRequest);
+    }
+
+
+    public String getStringImage(Bitmap bmp){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
+    }
+
     private void login() {
         if (!validate()){
             onLoginFail();
@@ -113,7 +198,8 @@ public class EnumerationActivity extends AppCompatActivity {
             if (!isOnLine()){
                 Toast.makeText(this, "Network isn't available", Toast.LENGTH_SHORT).show();
             }else{
-                makeCall();
+                //makeCall();
+                uploadImage();
             }
         }
     }
@@ -139,7 +225,19 @@ public class EnumerationActivity extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         progressDialog.dismiss();
-                        onLoginFailDialog();
+                        //Showing toast
+                        if (error instanceof TimeoutError || error instanceof NoConnectionError) {
+                            onLoginFailDialog("Communication Error!");
+
+                        } else if (error instanceof AuthFailureError) {
+                            onLoginFailDialog("Authentication Error!");
+                        } else if (error instanceof ServerError) {
+                            onLoginFailDialog("Server Side Error!");
+                        } else if (error instanceof NetworkError) {
+                            onLoginFailDialog("Network Error!");
+                        } else if (error instanceof ParseError) {
+                            onLoginFailDialog("Parse Error!");
+                        }
                     }
                 }){
             //adding header param
@@ -193,7 +291,7 @@ public class EnumerationActivity extends AppCompatActivity {
         }).show();
     }
 
-    private void onLoginFailDialog() {
+    private void onLoginFailDialog(String msg) {
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             /*builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);*/
@@ -203,7 +301,7 @@ public class EnumerationActivity extends AppCompatActivity {
         }
 
         builder.setTitle("Error Message");
-        builder.setMessage("Unable to process information");
+        builder.setMessage(msg);
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
